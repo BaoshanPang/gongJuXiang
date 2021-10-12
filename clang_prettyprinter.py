@@ -26,15 +26,14 @@ class MultiLevelTemplateArgumentListPrinter:
     def to_string(self):
        eval_string = "(*("+str(self.val.type)+"*)("+str(self.val.address)+")).TemplateArgumentLists.size()"
        depth = int(gdb.parse_and_eval(eval_string))
-       strstr = "\n"
+       strstr = ""
        for i in range(depth):
            eval_string = "(*("+str(self.val.type)+"*)("+str(self.val.address)+")).TemplateArgumentLists[{}].size()".format(i)
            sz = int(gdb.parse_and_eval(eval_string))
-           strstr += "level: {} ".format(i)
+           strstr += "\nlevel {}: args {}".format(i, sz)
            for j in range(sz):
-               strstr += "index {} ".format(j)
-               eval_string = "(*("+str(self.val.type)+"*)("+str(self.val.address)+")).TemplateArgumentLists[{}][{}].dump()".format(i,j)
-               strstr += "\n" + str(gdb.parse_and_eval(eval_string))
+               eval_string = "p (*("+str(self.val.type)+"*)("+str(self.val.address)+")).TemplateArgumentLists[{}][{}].dump()".format(i,j)
+               gdb.execute(eval_string,True,True)
        return  strstr
 
 pp = gdb.printing.RegexpCollectionPrettyPrinter("CLANGSupport")
